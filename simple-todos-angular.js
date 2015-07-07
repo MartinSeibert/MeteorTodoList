@@ -1,23 +1,22 @@
-if (Meteor.isClient) {
-  // counter starts at 0
-  Session.setDefault('counter', 0);
+Tasks = new Mongo.Collection("tasks");
 
-  Template.hello.helpers({
-    counter: function () {
-      return Session.get('counter');
-    }
-  });
+if (Meteor.isClient){
 
-  Template.hello.events({
-    'click button': function () {
-      // increment the counter when button is clicked
-      Session.set('counter', Session.get('counter') + 1);
-    }
-  });
-}
+  // This code only runs on the client
+  angular.module("simple-todos",['angular-meteor']);
 
-if (Meteor.isServer) {
-  Meteor.startup(function () {
-    // code to run on server at startup
-  });
+  angular.module("simple-todos").controller("TodosListCtrl", ['$scope', '$meteor',
+    function($scope, $meteor){
+
+      $scope.tasks = $meteor.collection(function(){
+        return Tasks.find({}, { sort: { createdAt: -1 } })
+
+      });
+      $scope.addTask = function(newTask){
+        $scope.tasks.push( {
+          text: newTask,
+          createdAt: new Date() }
+        );
+      };
+    }]);
 }
